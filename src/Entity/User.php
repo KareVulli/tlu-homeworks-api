@@ -1,17 +1,51 @@
 <?php
 namespace App\Entity;
 
+use App\Controller\UserRegister;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Table(name="`user`")
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\Entity
+ * @UniqueEntity(fields="email", message="Email already taken")
+ * @UniqueEntity(fields="username", message="Username already taken")
  * @ApiResource(
  *     normalizationContext={"groups"={"user", "user:read"}},
- *     denormalizationContext={"groups"={"user", "user:write"}}
+ *     denormalizationContext={"groups"={"user", "user:write"}},
+ *     collectionOperations={
+ *         "get",
+ *         "register"={
+ *             "method"="POST",
+ *             "path"="/user",
+ *             "controller"=UserRegister::class
+ *         },
+ *         "login"={
+ *             "route_name"="login_check",
+ *             "method"="POST",
+ *             "swagger_context"={
+ *                 "parameters"={
+ *                     {
+ *                         "name"="json",
+ *                         "in"="body",
+ *                         "required"="false",
+ *                         "type"="string"
+ *                     }
+ *                 },
+ *                 "summary" = "Creates a token for authentiaction",
+ *                 "consumes" = {
+ *                      "application/json"
+ *                 },
+ *                 "produces" = {
+ *                      "application/json"
+ *                  }
+ *             }
+ *         }
+ *     }
  * )
  */
 class User implements UserInterface, \Serializable
@@ -28,6 +62,7 @@ class User implements UserInterface, \Serializable
     /**
      * @var string The username.
      * 
+     * @Assert\NotBlank()
      * @Groups({"user"})
      * @ORM\Column(type="string", length=25, unique=true)
      */
@@ -41,6 +76,10 @@ class User implements UserInterface, \Serializable
     private $password;
 
     /**
+     * @var string The plain password to hash.
+     * 
+     * @Assert\NotBlank()
+     * @Assert\Length(max=4096)
      * @Groups({"user:write"})
      */
     private $plainPassword;
@@ -48,6 +87,8 @@ class User implements UserInterface, \Serializable
     /**
      * @var string The user's email.
      * 
+     * @Assert\NotBlank()
+     * @Assert\Email()
      * @Groups({"user"})
      * @ORM\Column(type="string", length=256, unique=true)
      */
@@ -56,14 +97,25 @@ class User implements UserInterface, \Serializable
     /**
      * @var bool User permissions status. True if user is an admin.
      * 
+     * @Groups({"user:read"})
      * @ORM\Column(type="boolean")
      */
     private $admin;
 
     public function __construct()
     {
-        $this->isActive = true;
+        $this->admin = false;
     }
+
+    /**
+	 * Get the id of this user.
+	 *
+	 * @return int
+	 */
+	public function getId(): int
+	{
+		return $this->id;
+	}
 
     /**
 	 * Get the username.
@@ -113,6 +165,30 @@ class User implements UserInterface, \Serializable
 		return $this;
     }
     
+    /**
+	 * Get the plain password to hash.
+	 *
+	 * @return string
+	 */
+	public function getPlainPassword(): string
+	{
+		return $this->plainPassword;
+	}
+
+	/**
+	 * Set the plain password to hash.
+	 *
+	 * @param string $plainPassword The plain password to hash.
+	 *
+	 * @return self
+	 */
+	public function setPlainPassword(string $plainPassword)
+	{
+		$this->plainPassword = $plainPassword;
+
+		return $this;
+	}
+
     /**
 	 * Get the user's email.
 	 *
