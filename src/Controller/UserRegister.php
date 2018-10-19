@@ -21,6 +21,14 @@ class UserRegister
         $password = $this->passwordEncoder->encodePassword($data, $data->getPlainPassword());
         $data->setPassword($password);
 
+        // If no users exist. make the user admin.
+        $repository = $this->em->getRepository(User::class);
+        $qb = $repository->createQueryBuilder('u')->select('COUNT(u)');
+        $count = $qb->getQuery()->getSingleScalarResult();
+        if ($count == 0) {
+            $data->setAdmin(true);
+        }
+
         $this->em->persist($data);
         $this->em->flush();
 

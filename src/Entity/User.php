@@ -18,7 +18,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *     normalizationContext={"groups"={"user", "user:read"}},
  *     denormalizationContext={"groups"={"user", "user:write"}},
  *     collectionOperations={
- *         "get",
+ *         "get"={"access_control"="is_granted('ROLE_ADMIN')"},
  *         "register"={
  *             "method"="POST",
  *             "path"="/user",
@@ -45,7 +45,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *                  }
  *             }
  *         }
- *     }
+ *     },
+ * 	   itemOperations={
+ *			"get"={"access_control"="is_granted('ROLE_ADMIN') or object == user"},
+ * 	   }
  * )
  */
 class User implements UserInterface, \Serializable

@@ -9,7 +9,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * A lesson.
  *
- * @ApiResource
+ * @ApiResource(
+ * 		attributes={"access_control"="is_granted('ROLE_USER')"},
+ * 		collectionOperations={
+ *         	"get",
+ *         	"post"={"access_control"="is_granted('ROLE_ADMIN')"}
+ *     	},
+ *     	itemOperations={
+ * 			"get",
+ *         	"put"={"access_control"="is_granted('ROLE_ADMIN')"},
+ * 			"delete"={"access_control"="is_granted('ROLE_ADMIN')"},
+ *     	}
+ * )
  * @ORM\Entity
  */
 class Lesson
@@ -60,7 +71,14 @@ class Lesson
      *
      * @ORM\OneToMany(targetEntity="Task", mappedBy="lesson")
      */
-    public $tasks;
+	public $tasks;
+	
+	/**
+     * @var Group[] All groups that have this lesson.
+     *
+     * @ORM\ManyToMany(targetEntity="Group", mappedBy="lessons")
+     */
+    public $groups;
     
     public function __construct() {
         $this->tasks = new ArrayCollection();
@@ -187,6 +205,30 @@ class Lesson
 	public function setTasks($tasks)
 	{
 		$this->tasks = $tasks;
+
+		return $this;
+	}
+
+	/**
+	 * Get all groups that have this lesson.
+	 *
+	 * @return Group[]
+	 */
+	public function getGroups()
+	{
+		return $this->groups;
+	}
+
+	/**
+	 * Set all groups that have this lesson.
+	 *
+	 * @param Group[] $groups All groups that have this lesson.
+	 *
+	 * @return self
+	 */
+	public function setGroups($groups)
+	{
+		$this->groups = $groups;
 
 		return $this;
 	}
