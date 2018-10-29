@@ -12,10 +12,15 @@ metadata:
       {{ $key }}: {{ $value | quote }}
     {{- end }}
 spec:
-  backend:
-    serviceName: {{ if .Values.varnish.enabled }}varnish{{ else }}api{{ end }}
-    servicePort: 80
-  {{- if .Values.ingress.tls }}
+  rules:
+  - host: tlu.j2rvaservud.eu
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ if .Values.varnish.enabled }}varnish{{ else }}api{{ end }}
+          servicePort: 80
   tls:
-{{ toYaml .Values.ingress.tls | indent 4 }}
-  {{- end -}}
+  - hosts:
+    - tlu.j2rvaservud.eu
+    secretName: tls-secret

@@ -15,10 +15,18 @@ spec:
         app: {{ template "name" . }}-php
         release: {{ .Release.Name }}
     spec:
+      volumes:
+      - name: secret-volume
+        secret:
+          secretName: jwt-secret
       containers:
         - name: {{ .Chart.Name }}-php
           image: "{{ .Values.php.repository }}:{{ .Values.php.tag }}"
           imagePullPolicy: {{ .Values.php.pullPolicy }}
+          volumeMounts:
+          - name: secret-volume
+            readOnly: true
+            mountPath: "/etc/secret-volume"
           ports:
             - containerPort: 9000
           env:
@@ -52,6 +60,15 @@ spec:
                 secretKeyRef:
                   name: {{ template "fullname" . }}
                   key: database-url
+            - name: JWT_PASSPHRASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: jwt-key-password
+            - name: JWT_SECRET_KEY
+              value: "/etc/secret-volume/ssh-privatekey"
+            - name: JWT_PUBLIC_KEY
+              value: "/etc/secret-volume/ssh-publickey"
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- if .Values.nodeSelector }}

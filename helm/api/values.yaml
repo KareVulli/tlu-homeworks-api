@@ -6,6 +6,7 @@ env: prod
 debug: '0'
 secret: ChangeMe
 corsAllowOrigin: http://example.com
+jwtKeyPassword: ChangeMe
 
 php:
   repository: quay.io/api-platform/php
@@ -29,13 +30,14 @@ varnish:
 
 ingress:
   annotations:
-    # kubernetes.io/ingress.class: gce
-    # kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /
   tls:
-    # Secrets must be manually created in the namespace.
-    # - secretName: chart-example-tls
-    #   hosts:
-    #     - chart-example.local
+  # Secrets must be manually created in the namespace.
+  - hosts:
+    - tlu.j2rvaservud.eu
+    secretName: tls-secret
 
 postgresql:
   enabled: true
