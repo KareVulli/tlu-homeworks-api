@@ -2,15 +2,20 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Traits\CreatedTrait;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * A lesson.
  *
  * @ApiResource(
- * 		attributes={"access_control"="is_granted('ROLE_USER')"},
+ * 		denormalizationContext={"groups"={"write"}},
+ * 		attributes={"access_control"="is_granted('ROLE_USER')", "force_eager"=false},
  * 		collectionOperations={
  *         	"get",
  *         	"post"={"access_control"="is_granted('ROLE_ADMIN')"}
@@ -21,10 +26,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  * 			"delete"={"access_control"="is_granted('ROLE_ADMIN')"},
  *     	}
  * )
+ * @ApiFilter(SearchFilter::class, properties={"groups": "exact"})
  * @ORM\Entity
  */
 class Lesson
 {
+	use CreatedTrait;
+
     /**
      * @var int The id of this lesson.
      *
@@ -39,6 +47,7 @@ class Lesson
      *
 	 * @Assert\NotBlank
      * @ORM\Column
+	 * @Groups({"write"})
      */
     private $code;
 
@@ -47,6 +56,7 @@ class Lesson
      *
 	 * @Assert\NotBlank
      * @ORM\Column
+	 * @Groups({"write"})
      */
     private $name;
 
@@ -55,6 +65,7 @@ class Lesson
      *
 	 * @Assert\NotBlank
      * @ORM\Column(type="text")
+	 * @Groups({"write"})
      */
     public $description;
 
@@ -63,6 +74,7 @@ class Lesson
      *
 	 * @Assert\NotBlank
      * @ORM\Column
+	 * @Groups({"write"})
      */
     public $teacher;
 
@@ -70,6 +82,7 @@ class Lesson
      * @var Task[] All tasks for this lesson.
      *
      * @ORM\OneToMany(targetEntity="Task", mappedBy="lesson")
+	 * @Groups({"write"})
      */
 	public $tasks;
 	
@@ -77,6 +90,7 @@ class Lesson
      * @var Group[] All groups that have this lesson.
      *
      * @ORM\ManyToMany(targetEntity="Group", mappedBy="lessons")
+	 * @Groups({"write"})
      */
     public $groups;
     

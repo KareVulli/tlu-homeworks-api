@@ -3,14 +3,20 @@ namespace App\Entity;
 
 use App\Entity\Lesson;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Traits\CreatedTrait;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * A single homework task.
  *
  * @ApiResource(
- * 		attributes={"access_control"="is_granted('ROLE_USER')"},
+ * 		denormalizationContext={"groups"={"write"}},
+ * 		attributes={"access_control"="is_granted('ROLE_USER')", "force_eager"=false},
  * 		collectionOperations={
  *         	"get",
  *         	"post"={"access_control"="is_granted('ROLE_ADMIN')"}
@@ -21,10 +27,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  * 			"delete"={"access_control"="is_granted('ROLE_ADMIN')"},
  *     	}
  * )
+ * @ApiFilter(SearchFilter::class, properties={"lesson.groups": "exact", "lesson": "exact"})
  * @ORM\Entity
  */
 class Task
 {
+	use CreatedTrait;
+	
     /**
      * @var int The id of this task.
      *
@@ -39,6 +48,7 @@ class Task
      *
 	 * @Assert\NotBlank
      * @ORM\Column
+	 * @Groups({"write"})
      */
     private $title;
 
@@ -47,6 +57,7 @@ class Task
      *
 	 * @Assert\NotBlank
      * @ORM\Column(type="text")
+	 * @Groups({"write"})
      */
     public $description;
 
@@ -55,6 +66,7 @@ class Task
      *
 	 * @Assert\NotNull
      * @ORM\Column(type="datetime")
+	 * @Groups({"write"})
      */
     public $deadline;
 
@@ -63,6 +75,7 @@ class Task
      *
 	 * @Assert\NotNull
      * @ORM\ManyToOne(targetEntity="Lesson", inversedBy="tasks")
+	 * @Groups({"write"})
      */
     public $lesson;
 

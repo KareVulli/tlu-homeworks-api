@@ -3,6 +3,7 @@ namespace App\Entity;
 
 use App\Controller\UserRegister;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Traits\CreatedTrait;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -15,8 +16,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @UniqueEntity(fields="email", message="Email already taken")
  * @UniqueEntity(fields="username", message="Username already taken")
  * @ApiResource(
- *     normalizationContext={"groups"={"user", "user:read"}},
- *     denormalizationContext={"groups"={"user", "user:write"}},
+ *     normalizationContext={"groups"={"user", "read"}},
+ *     denormalizationContext={"groups"={"user", "write"}},
  *     collectionOperations={
  *         "get"={"access_control"="is_granted('ROLE_ADMIN')"},
  *         "register"={
@@ -30,10 +31,13 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *             "swagger_context"={
  *                 "parameters"={
  *                     {
- *                         "name"="json",
+ *                         "name"="login",
  *                         "in"="body",
- *                         "required"="false",
- *                         "type"="string"
+ *                         "required"=false,
+ * 						   "properties"={
+ * 								"username"={"type"="string"},
+ * 								"password"={"type"="string"},
+ * 						   }
  *                     }
  *                 },
  *                 "summary" = "Creates a token for authentiaction",
@@ -53,6 +57,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  */
 class User implements UserInterface, \Serializable
 {
+	use CreatedTrait;
+
     /**
      * @var int The id of this user.
      * 
@@ -83,7 +89,7 @@ class User implements UserInterface, \Serializable
      * 
      * @Assert\NotBlank()
      * @Assert\Length(max=4096)
-     * @Groups({"user:write"})
+     * @Groups({"write"})
      */
     private $plainPassword;
 
@@ -100,7 +106,7 @@ class User implements UserInterface, \Serializable
     /**
      * @var bool User permissions status. True if user is an admin.
      * 
-     * @Groups({"user:read"})
+     * @Groups({"read"})
      * @ORM\Column(type="boolean")
      */
     private $admin;

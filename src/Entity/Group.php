@@ -2,14 +2,17 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Traits\CreatedTrait;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * A study group / class.
  *
  * @ApiResource(
+ * 		denormalizationContext={"groups"={"write"}},
  * 		attributes={"access_control"="is_granted('ROLE_USER')"},
  * 		collectionOperations={
  *         	"get",
@@ -26,6 +29,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Group
 {
+	use CreatedTrait;
+
     /**
      * @var int The id of this group.
      *
@@ -40,6 +45,7 @@ class Group
      *
 	 * @Assert\NotBlank
      * @ORM\Column
+	 * @Groups({"write"})
      */
     private $code;
 
@@ -48,12 +54,14 @@ class Group
      *
 	 * @Assert\NotBlank
      * @ORM\Column
+	 * @Groups({"write"})
      */
     private $name;
 
     /**
      * @var Lesson[] All lessons for this group.
      *
+	 * @Groups({"write"})
      * @ORM\ManyToMany(targetEntity="Lesson", inversedBy="groups")
      * @ORM\JoinTable(name="groups_lessons")
      */
