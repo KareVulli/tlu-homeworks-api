@@ -7,6 +7,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * A study group / class.
@@ -25,6 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     	}
  * )
  * @ORM\Entity()
+ * @UniqueEntity("code")
  * @ORM\Table(name="`group`")
  */
 class Group
@@ -44,7 +46,7 @@ class Group
      * @var string The group's code.
      *
 	 * @Assert\NotBlank
-     * @ORM\Column
+     * @ORM\Column(unique=true)
 	 * @Groups({"write"})
      */
     private $code;
