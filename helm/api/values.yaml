@@ -9,13 +9,13 @@ corsAllowOrigin: http://example.com
 jwtKeyPassword: ChangeMe
 
 php:
-  repository: quay.io/api-platform/php
+  repository: tluhomeworksregistry.azurecr.io/tlu-homeworks/php
   tag: latest
   pullPolicy: Always
   replicaCount: 1
 
 nginx:
-  repository: quay.io/api-platform/nginx
+  repository: tluhomeworksregistry.azurecr.io/tlu-homeworks/nginx
   tag: latest
   pullPolicy: Always
   replicaCount: 1
@@ -23,7 +23,7 @@ nginx:
 varnish:
   enabled: true
   #url: https://example.com
-  repository: quay.io/api-platform/varnish
+  repository: tluhomeworksregistry.azurecr.io/tlu-homeworks/varnish
   tag: latest
   pullPolicy: Always
   replicaCount: 1
