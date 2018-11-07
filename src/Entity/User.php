@@ -13,6 +13,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Table(name="`user`")
  * @ORM\Entity
+ * @UniqueEntity(fields="email", message="Email already taken")
  * @UniqueEntity(fields="username", message="Username already taken")
  * @ApiResource(
  *     normalizationContext={"groups"={"user", "read"}},
@@ -98,7 +99,7 @@ class User implements UserInterface, \Serializable
      * @Assert\NotBlank()
      * @Assert\Email()
      * @Groups({"user"})
-     * @ORM\Column(type="string", length=256, unique=true)
+     * @ORM\Column(type="string", length=256)
      */
     private $email;
 
