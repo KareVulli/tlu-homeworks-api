@@ -8,12 +8,12 @@ return new class extends DefaultDeployer
     {
         return $this->getConfigBuilder()
             // SSH connection string to connect to the remote server (format: user@host-or-IP:port-number)
-            ->server('j2rvaservud')
+            ->server('karevulli@localhost')
             // the absolute path of the remote server directory where the project is deployed
             ->deployDir('/var/www/vhosts/tluapi')
-            // the URL of the Git repository where the project code is hosted
+            
+            ->sharedFilesAndDirs(['config/jwt/'])
             ->repositoryUrl('git@github.com:KareVulli/tlu-homeworks-api.git')
-            // the repository branch to deploy
             ->repositoryBranch('master')
         ;
     }
@@ -28,6 +28,6 @@ return new class extends DefaultDeployer
     public function beforeFinishingDeploy()
     {
         // $this->runRemote('{{ console_bin }} app:my-task-name');
-        $this->runLocal('say "The deployment has finished."');
+        $this->runLocal('echo "The deployment has finished."');
     }
 };
